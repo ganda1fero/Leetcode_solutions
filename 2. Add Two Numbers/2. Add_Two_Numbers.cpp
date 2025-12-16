@@ -14,12 +14,12 @@ class Solution {
 public:
     ListNode* addTwoNumbers(ListNode* list_1, ListNode* list_2) {
         // переменные
-        ListNode* tmp_ptr_1{ list_1 }, * tmp_ptr_2{ list_2 }, *answer_ptr, *answer_tmp_ptr;
+        ListNode* tmp_ptr_1{ list_1 }, *tmp_ptr_2{ list_2 }, *answer_ptr, *answer_tmp_ptr;
         int now_numb{ 0 };
         bool remainder{ false };    // так как 9 + 9 = 18 => всегда может остаться только 1 на перенос
         
         // делаем (нулевую операцию)
-        now_numb += tmp_ptr_1->val + tmp_ptr_2->val;    // посчитали сумму
+        now_numb = tmp_ptr_1->val + tmp_ptr_2->val;    // посчитали сумму
         tmp_ptr_1 = tmp_ptr_1->next;
         tmp_ptr_2 = tmp_ptr_2->next;
         
