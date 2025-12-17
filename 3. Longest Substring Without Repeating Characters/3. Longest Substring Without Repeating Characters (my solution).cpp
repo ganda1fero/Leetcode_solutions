@@ -7,44 +7,22 @@ class Solution {
 public:
     int lengthOfLongestSubstring(string s) {
         // переменные
-        int max_len{ 0 }, calculate_max_len{ 0 };
-        int substr_start_index{ 0 }, now_index{0};    // начинается с 0
+        int max_len{ 0 }, substr_start_index{ 0 }, now_index{ 0 };    // начинается с 0
         const int string_len = s.length();
-        unordered_map<char, int> char_memory;   // словарь: ключ - char | значение - индекс char значения 
+        vector<int> ANSI_pos(128, -1); // создали массив с позицией == -1 (начальное)
 
         while (now_index < string_len) {
-            if (char_memory.count(s[now_index]) == 0) {
-                // значит такого символа еще не было
-                char_memory.emplace(s[now_index], now_index); // записали значение | индекс значения
-            }
-            else {
-                // такой символ уже был! (возможно)
-                if (char_memory[s[now_index]] < substr_start_index) { // этот индекс был "удален" - просто перезаписываем значение
-                    char_memory[s[now_index]] = now_index;  // обновили значение индекса этого символа
-                }
-                else { // значит повторяется в нынешней substr
-                    calculate_max_len = now_index - substr_start_index;
-                    if (max_len < calculate_max_len) {
-                        max_len = calculate_max_len;
-                    }
-
-                    // обновляем указатель начала новой substr
-                    substr_start_index = char_memory[s[now_index]] + 1;
-
-                    // обновляем значение символа
-                    char_memory[s[now_index]] = now_index;
-                }
+            if (ANSI_pos[s[now_index]] >= substr_start_index) {  //  такой символ в подстроке есть!
+                max_len = max(max_len, now_index - substr_start_index); // (обновили) max_len
+                substr_start_index = ANSI_pos[s[now_index]] + 1;
             }
 
+            ANSI_pos[s[now_index]] = now_index; // автоматом записываем/перезаисываем индекс символа 
             now_index++;
         }
 
-        // считаем что получилось в конце (не было пересечений)
-        calculate_max_len = now_index - substr_start_index;
-        if (max_len < calculate_max_len) {
-            max_len = calculate_max_len;
-        }
-
+        // считаем что получилось в конце (на всякий если не было пересечений)
+        max_len = max(max_len, now_index - substr_start_index);
         return max_len;
     }
 };
@@ -58,7 +36,7 @@ int main() {
 
     string s1 = "abcabcbb";
     string s2 = "pwwkew";
-    string s3 = "";
+    string s3 = "3212";
     string s4 = "f  ";
 
     cout << s1 << " | " << solution.lengthOfLongestSubstring(s1) << std::endl;
