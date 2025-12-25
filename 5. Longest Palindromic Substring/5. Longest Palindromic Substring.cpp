@@ -1,51 +1,48 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
+
+void CheackMaxPalindrom(int& now_start_index, int& now_len, const int new_start_index, const int new_len) {
+    if (now_len < new_len) {
+        now_start_index = new_start_index;
+        now_len = new_len;
+    }
+}
 
 class Solution {
 public:
     string longestPalindrome(string s) {
-        int now_index{ 0 };
         const int str_len = s.length();
 
-        int palind_start{ 0 }, palind_len{ 1 };
+        int palindr_start_index{ 0 }, palindr_len{ 1 };
 
-        int tmp_owset, tmp_left_index, tmp_right_index;
-        while (now_index < str_len - 1) { // перебираем по строке (середину)
-            // проверем (центр = эл.)
-            tmp_owset = 0;
-            tmp_left_index = now_index - (tmp_owset + 1);
-            tmp_right_index = now_index + (tmp_owset + 1);
-            while (tmp_left_index >= 0 && tmp_right_index < str_len && s[tmp_left_index] == s[tmp_right_index]) {
+        int tmp_owset;
+        for (int i{ 0 }; i < str_len - 1; i++) {    // перебор индекса центраы
+            // центр = эл.
+            tmp_owset = 1;
+
+            while (i - tmp_owset >= 0 && i + tmp_owset < str_len && s[i - tmp_owset] == s[i + tmp_owset]) {
                 tmp_owset++;
-                tmp_left_index = now_index - (tmp_owset + 1);
-                tmp_right_index = now_index + (tmp_owset + 1);
-            }
+            }   // будет идти до тех пор, пока не выйдем за пределы или не будет равно (закончится палиндром)
+            tmp_owset--;
 
-            if (palind_len < tmp_owset * 2 + 1) {
-                palind_start = now_index - tmp_owset;
-                palind_len = tmp_owset * 2 + 1;
-            }
+            CheackMaxPalindrom(palindr_start_index, palindr_len, i - tmp_owset, tmp_owset * 2 + 1);
 
-            // проверяем (центр = мнимый после эл.)
+            // центр = между элементами
             tmp_owset = 0;
-            tmp_left_index = now_index - tmp_owset;
-            tmp_right_index = now_index + (tmp_owset + 1);
-            while (tmp_left_index >= 0 && tmp_right_index < str_len && s[tmp_left_index] == s[tmp_right_index]) {
+
+            while (i - tmp_owset >= 0 && i + 1 + tmp_owset < str_len && s[i - tmp_owset] == s[i + 1 + tmp_owset]) {
                 tmp_owset++;
-                tmp_left_index = now_index - tmp_owset;
-                tmp_right_index = now_index + (tmp_owset + 1);
             }
+            tmp_owset--;
 
-            if (s[now_index - (tmp_owset - 1)] == s[now_index + tmp_owset] && palind_len < (tmp_owset - 1) * 2 + 2) {
-                palind_start = now_index - (tmp_owset - 1);
-                palind_len = (tmp_owset - 1) * 2 + 2;
+            if (tmp_owset >= 0) {
+                CheackMaxPalindrom(palindr_start_index, palindr_len, i - tmp_owset, tmp_owset * 2 + 2);
             }
-
-            now_index++;
         }
 
-        return s.substr(palind_start, palind_len);
+        return s.substr(palindr_start_index, palindr_len);
     }
 };
 
@@ -54,7 +51,7 @@ int main() {// для провреки
 
     std::string s1{ "babad" };
     std::string s2{ "cbbd" };
-    std::string s3{ "aaa" };
+    std::string s3{ "abacdgdcy" };
 
     //std::cout << solution.longestPalindrome(s1) << std::endl;
     //std::cout << solution.longestPalindrome(s2) << std::endl;
