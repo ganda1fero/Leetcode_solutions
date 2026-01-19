@@ -14,7 +14,7 @@ struct TreeNode {
 
 class Solution {
 public:
-    vector<vector<int>> levelOrder(TreeNode* root) {
+    vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
         if (root == nullptr) {
             return {};
         }
@@ -32,6 +32,9 @@ public:
             now_node = q.front();    // взяли node
             q.pop();
             if (now_node.level != last_level) {
+                if (now_node.level % 2 == 1) {
+                    std::reverse(tmp_level.begin(), tmp_level.end());
+                }
                 tree_levels.push_back(tmp_level);
                 tmp_level.clear();
                 last_level = now_node.level;
@@ -46,7 +49,6 @@ public:
                 q.push(tmp_root(now_node.ptr->right, now_node.level + 1));
             }
         }
-        tree_levels.push_back(tmp_level);
 
         return tree_levels;
     }
@@ -64,7 +66,7 @@ int main() {    // для проверки
 
     TreeNode tree(3, new TreeNode(9), new TreeNode(20, new TreeNode(15), new TreeNode(7)));
 
-    for (const vector<int>& arr : solution.levelOrder(&tree)) {
+    for (const vector<int>& arr : solution.zigzagLevelOrder(&tree)) {
         cout << '[';
         for (const int& num : arr) {
             cout << num << ',';
