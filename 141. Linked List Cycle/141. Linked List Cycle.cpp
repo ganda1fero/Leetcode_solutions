@@ -1,0 +1,26 @@
+#include <iostream>
+using namespace std;
+
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode(int x) : val(x), next(NULL) {}
+};
+
+class Solution {
+public:
+    bool hasCycle(ListNode* head) {
+        int counter{ 0 };
+
+        while (counter < 10001) {
+            if (head == nullptr) {
+                return false;
+            }
+
+            ++counter;
+            head = head->next;
+        }
+
+        return true;
+    }
+};
