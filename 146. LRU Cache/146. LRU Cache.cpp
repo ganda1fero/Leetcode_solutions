@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unordered_map>
 using namespace std;
 
 class LRUList {
@@ -15,14 +16,6 @@ public:
     node* back_node;    // tail of list
 
     inline LRUList() : front_node(nullptr), back_node(nullptr) {}
-    inline ~LRUList() {
-        node* tmp_ptr;
-        while (front_node != nullptr) {
-            tmp_ptr = front_node;
-            front_node = front_node->next;
-            delete tmp_ptr;
-        }
-    }
 
     inline void push_front(int val) {
         if (front_node == nullptr) {    // node is first in list
@@ -67,48 +60,51 @@ public:
 
 class LRUCache {
 public:
-    LRUCache(int capacity) : max_capacity(capacity), size(0) {}
+    LRUCache(int capacity) : max_capacity(capacity), size(0) {
+        data.rehash(capacity);
+    }
 
     inline int get(int key) {  // O(1)
-        if (node_arr[key].ptr == nullptr) {
+        auto it = data.find(key); // O(1) operation
+        if (it == data.end()) {
             return -1;  // (key not found)
         }
 
         // key found => move to top
-        if (node_arr[key].ptr != usage_rating.front_node) {    // if not already on the top
-            usage_rating.replace_to_front_not_first(node_arr[key].ptr); // O(1)
+        if (it->second.ptr != usage_rating.front_node) {    // if not already on the top
+            usage_rating.replace_to_front_not_first(it->second.ptr); // O(1)
         }
 
-        return node_arr[key].value;
+        return it->second.value;
     }
 
     inline void put(int key, int value) {  // O(1)
-        if (node_arr[key].ptr == nullptr) { // key is not exists => add
+        auto it = data.find(key);
+        if (it == data.end()) { // key is not exists => add
             if (size < max_capacity) {  // just add (without evict other node)
                 ++size;
                 usage_rating.push_front(key);
             }
             else {  // need to evict the worst (by popularity) node
-                node_arr[usage_rating.back_node->val].ptr = nullptr;
+                data.erase(usage_rating.back_node->val);
                 usage_rating.pop_back_and_emplace_front(key);
             }
-            node_arr[key] = map_node(value, usage_rating.front_node);
+            data.emplace(key, map_node(value, usage_rating.front_node));
         }
         else {  // key already exists in map => just update a value + push to top rating
-            node_arr[key].value = value;
-            if (node_arr[key].ptr != usage_rating.front_node) {    // if key not already on the top 
-                usage_rating.replace_to_front_not_first(node_arr[key].ptr);    // O(1)
+            it->second.value = value;
+            if (it->second.ptr != usage_rating.front_node) {    // if key not already on the top 
+                usage_rating.replace_to_front_not_first(it->second.ptr);    // O(1)
             }
         }
     }
 private:
     struct map_node {
-        map_node() : value(-1), ptr(nullptr) {}
         map_node(int value, LRUList::node* rating_ptr) : value(value), ptr(rating_ptr) {}
         int value;
         LRUList::node* ptr;
     };
-    map_node node_arr[10001];
+    unordered_map<int, map_node> data;
     LRUList usage_rating;
     const int max_capacity; // maximum of capacity
     int size;   // count of nodes in data (now)
@@ -134,4 +130,5 @@ int main() {    // for tests
     lru_cache.put(4, 4);
 
     cout << lru_cache.get(1) << ' ' << lru_cache.get(2) << ' ' << lru_cache.get(3) << ' ' << lru_cache.get(4);
+
 }
